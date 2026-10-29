@@ -1,0 +1,9 @@
+[build]
+  base = "Walfo-F-master"
+  publish = "dist/walfo-f/browser"
+  command = "npm run build"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
