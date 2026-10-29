@@ -168,18 +168,22 @@ USE_TZ = True
 CORS_ALLOWED_ORIGINS = [
     "http://127.0.0.1:8000",
     "http://localhost:4200",
+    "https://walfo-app.netlify.app",
     "https://walfovault.netlify.app",
 ]
 
 CORS_ALLOWED_ORIGIN_REGEXES = [
     r"^http://localhost:\d+$",
     r"^http://127.0.0.1:\d+$",
+    r"^https://.*\.netlify\.app$",
 ]
 
 CORS_ALLOW_CREDENTIALS = True
 
 CSRF_TRUSTED_ORIGINS = [
+    "https://walfo-app.netlify.app",
     "https://walfovault.netlify.app",
+    "https://*.netlify.app",
     "https://*.onrender.com",
     "https://*.railway.app",
     "http://localhost:4200",
