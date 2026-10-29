@@ -10,7 +10,7 @@
         <div class="text-field-container">
           <div class="text-field">
             <label for="email" class="top-name">Email</label>
-            <input type="email" id="email" class="input-text" [formControl]="$any(loginForm.get('email'))">
+            <input type="email" id="email" class="input-text" autocomplete="email" autocapitalize="none" autocorrect="off" spellcheck="false" inputmode="email" [formControl]="$any(loginForm.get('email'))">
             <p class="info-text" *ngIf="loginForm.get('email').hasError('required') && loginForm.get('email').touched">This field is required</p>
           </div>
           <div class="text-field">

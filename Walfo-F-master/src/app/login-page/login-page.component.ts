@@ -400,7 +400,11 @@ export class LoginPageComponent implements OnInit, OnDestroy {
   doLogin() {
     if (this.loginForm.valid) {
       this.loader = true;
-      let formData = this.loginForm.value;
+      const raw = this.loginForm.value;
+      const formData = {
+        email: (raw.email || '').trim().toLowerCase(),
+        password: raw.password
+      };
       this.web.verifyCredentials(formData).subscribe((response: any) => {
         const res = response;
         if (res.status) {

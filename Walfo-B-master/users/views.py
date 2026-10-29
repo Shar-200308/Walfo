@@ -116,19 +116,19 @@ def createUser(request):
             "status_code": 400,
             "message": 'Error happened while processing',
         }
-        email = request.data.get('email')
+        email = (request.data.get('email') or '').strip().lower()
         if not email:
             response_details['message'] = 'Email is required'
             return Response(response_details)
 
-        if User.objects.filter(email=email).exists():
+        if User.objects.filter(email__iexact=email).exists():
             response_details.update({
                 "status": False,
                 "status_code": 400,
                 "message": "User already exists",
             })
         else:
-            CurrentWork.objects.filter(email=email).delete()
+            CurrentWork.objects.filter(email__iexact=email).delete()
             otp = ''.join(random.choices('0123456789', k=4))
             CurrentWork.objects.create(email=email, otp=otp)
             _send_email_async(
@@ -163,9 +163,9 @@ def verifyOtp(request):
         "status_code": 400,
         "message": 'Error happened while processing',
     }
-    email = request.data.get('email')
-    otp = request.data.get('otp')
-    name = request.data.get('name')
+    email = (request.data.get('email') or '').strip().lower()
+    otp = (request.data.get('otp') or '').strip()
+    name = (request.data.get('name') or '').strip()
     password = request.data.get('password')
     face_descriptor = request.data.get('face_descriptor')
     face_image = request.data.get('face_image')
@@ -175,7 +175,7 @@ def verifyOtp(request):
         return Response(response_details)
 
     try:
-        otp_entry = CurrentWork.objects.filter(email=email).order_by('-created_at').first()
+        otp_entry = CurrentWork.objects.filter(email__iexact=email).order_by('-created_at').first()
 
         if not otp_entry:
             response_details['message'] = 'OTP not found for this email'
@@ -188,7 +188,7 @@ def verifyOtp(request):
             return Response(response_details)
 
         if str(otp_entry.otp) == str(otp):
-            if User.objects.filter(email=email).exists():
+            if User.objects.filter(email__iexact=email).exists():
                 response_details['message'] = 'User already exists'
             else:
                 descriptor_str = json.dumps(face_descriptor) if face_descriptor is not None else None
@@ -244,14 +244,14 @@ def requestOtpWithPassword(request):
         "message": "An error occurred during processing",
     }
 
-    email = request.data.get('email')
+    email = (request.data.get('email') or '').strip().lower()
     password = request.data.get('password')
     if not email or not password:
         response_details['message'] = 'Email and password are required'
         return Response(response_details)
 
     try:
-        user = User.objects.filter(email=email).first()
+        user = User.objects.filter(email__iexact=email).first()
         if not user:
             response_details['message'] = 'User does not exist'
             return Response(response_details)
@@ -259,7 +259,7 @@ def requestOtpWithPassword(request):
             response_details['message'] = 'Incorrect password'
             return Response(response_details)
 
-        CurrentWork.objects.filter(email=email).delete()
+        CurrentWork.objects.filter(email__iexact=email).delete()
         otp = ''.join(random.choices('0123456789', k=4))
         CurrentWork.objects.create(email=email, otp=otp)
         _send_email_async(
@@ -285,7 +285,7 @@ def requestOtpWithPassword(request):
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def verify_credentials(request):
-    email = request.data.get('email')
+    email = (request.data.get('email') or '').strip().lower()
     password = request.data.get('password')
     if not email or not password:
         return Response({
@@ -293,7 +293,7 @@ def verify_credentials(request):
             "status_code": 400,
             "message": "Email and password are required",
         })
-    user = User.objects.filter(email=email).first()
+    user = User.objects.filter(email__iexact=email).first()
     if not user:
         return Response({"status": False, "status_code": 400, "message": "User does not exist"})
     if not user.check_password(password):
@@ -319,14 +319,14 @@ def verify_credentials(request):
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def verify_face_and_send_otp(request):
-    email = request.data.get('email')
+    email = (request.data.get('email') or '').strip().lower()
     password = request.data.get('password')
     input_descriptor = request.data.get('face_descriptor')
 
     if not email or not password:
         return Response({"status": False, "status_code": 400, "message": "Email and password are required"})
 
-    user = User.objects.filter(email=email).first()
+    user = User.objects.filter(email__iexact=email).first()
     if not user:
         return Response({"status": False, "status_code": 400, "message": "User does not exist"})
     if not user.check_password(password):
@@ -527,15 +527,15 @@ def loginverifyOtp(request):
         "message": "Error happened while processing",
     }
 
-    email = request.data.get('email')
-    otp = request.data.get('otp')
+    email = (request.data.get('email') or '').strip().lower()
+    otp = (request.data.get('otp') or '').strip()
 
     if not email or not otp:
         response_details['message'] = 'Email and OTP are required'
         return Response(response_details)
 
     try:
-        otp_entry = CurrentWork.objects.filter(email=email).order_by('-created_at').first()
+        otp_entry = CurrentWork.objects.filter(email__iexact=email).order_by('-created_at').first()
 
         if not otp_entry:
             response_details['message'] = 'OTP not found for this email'
@@ -549,7 +549,7 @@ def loginverifyOtp(request):
 
         if str(otp_entry.otp) == str(otp):
             otp_entry.delete()
-            user = User.objects.filter(email=email).first()
+            user = User.objects.filter(email__iexact=email).first()
             if not user:
                 response_details['message'] = 'User not found for this email'
                 return Response(response_details)
@@ -574,15 +574,15 @@ def loginverifyOtp(request):
 @permission_classes([AllowAny])
 def forgot_password(request):
     """Step 1 – verify account exists, then send 4-digit OTP."""
-    email = request.data.get('email')
+    email = (request.data.get('email') or '').strip().lower()
     if not email:
         return Response({'status': False, 'status_code': 400, 'message': 'Email is required'})
 
-    user = User.objects.filter(email=email).first()
+    user = User.objects.filter(email__iexact=email).first()
     if not user:
         return Response({'status': False, 'status_code': 404, 'message': 'No account found with this email'})
 
-    CurrentWork.objects.filter(email=email).delete()
+    CurrentWork.objects.filter(email__iexact=email).delete()
     otp = ''.join(random.choices('0123456789', k=4))
     CurrentWork.objects.create(email=email, otp=otp)
     _send_email_async(
@@ -602,15 +602,15 @@ def forgot_password(request):
 @permission_classes([AllowAny])
 def reset_password(request):
     """Step 2 – verify OTP, set new hashed password, send confirmation email."""
-    email = request.data.get('email')
-    otp = request.data.get('otp')
+    email = (request.data.get('email') or '').strip().lower()
+    otp = (request.data.get('otp') or '').strip()
     new_password = request.data.get('new_password')
 
     if not email or not otp or not new_password:
         return Response({'status': False, 'status_code': 400,
                          'message': 'Email, OTP and new password are required'})
 
-    otp_entry = CurrentWork.objects.filter(email=email).order_by('-created_at').first()
+    otp_entry = CurrentWork.objects.filter(email__iexact=email).order_by('-created_at').first()
     if not otp_entry:
         return Response({'status': False, 'status_code': 400,
                          'message': 'OTP not found. Please request a new one.'})
@@ -624,7 +624,7 @@ def reset_password(request):
     if str(otp_entry.otp) != str(otp):
         return Response({'status': False, 'status_code': 400, 'message': 'Invalid OTP'})
 
-    user = User.objects.filter(email=email).first()
+    user = User.objects.filter(email__iexact=email).first()
     if not user:
         return Response({'status': False, 'status_code': 404, 'message': 'User not found'})
 

@@ -232,7 +232,12 @@ export class SignupPageComponent implements OnInit, OnDestroy {
         this.toaster.showToaster();
         return;
       }
-      const formData = this.signupForm.value;
+      const raw = this.signupForm.value;
+      const formData = {
+        name: (raw.name || '').trim(),
+        email: (raw.email || '').trim().toLowerCase(),
+        password: raw.password
+      };
       this.web.createUser(formData).subscribe({
         next: (response: any) => {
           this.loader = false;
@@ -273,8 +278,8 @@ export class SignupPageComponent implements OnInit, OnDestroy {
     this.verifyingOtp = true;
     let otp = this.otpForm.value.otp1+this.otpForm.value.otp2+this.otpForm.value.otp3+this.otpForm.value.otp4;
     let data = {
-      'name': this.signupForm.value.name,
-      'email': this.signupForm.value.email,
+      'name': (this.signupForm.value.name || '').trim(),
+      'email': (this.signupForm.value.email || '').trim().toLowerCase(),
       'password': this.signupForm.value.password,
       'otp': otp,
       'face_descriptor': this.faceDescriptor,
