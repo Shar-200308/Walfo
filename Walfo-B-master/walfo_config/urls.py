@@ -38,17 +38,57 @@ def health_check(request):
         import traceback
         db_status = f"database error: {str(e)} | {traceback.format_exc()}"
 
+    resend_key = os.environ.get('RESEND_API_KEY', '').strip()
+
     return JsonResponse({
         "status": "healthy" if "error" not in db_status else "unhealthy",
         "service": "Walfo API",
         "database": db_status,
         "users": emails,
-        "latest_pending_otp": latest_otp
+        "latest_pending_otp": latest_otp,
+        "resend_key_configured": bool(resend_key),
+        "resend_prefix": (resend_key[:6] + "...") if resend_key else "NOT_CONFIGURED"
     })
+
+
+def test_email(request):
+    import requests
+    key = os.environ.get('RESEND_API_KEY', '').strip()
+    if not key:
+        return JsonResponse({
+            "status": False,
+            "message": "RESEND_API_KEY is not set in Render Environment Variables!"
+        })
+
+    to_email = request.GET.get('to', 'sharan2003murali@gmail.com')
+    try:
+        resp = requests.post(
+            "https://api.resend.com/emails",
+            headers={
+                "Authorization": f"Bearer {key}",
+                "Content-Type": "application/json"
+            },
+            json={
+                "from": "Walfo <onboarding@resend.dev>",
+                "to": [to_email],
+                "subject": "Walfo Live Test Email",
+                "text": "Hello Sharan! This is a test email sent from Walfo on Render via Resend."
+            },
+            timeout=10
+        )
+        return JsonResponse({
+            "status": resp.status_code in (200, 201, 202),
+            "status_code": resp.status_code,
+            "sent_to": to_email,
+            "resend_response": resp.json() if resp.headers.get('content-type', '').startswith('application/json') else resp.text
+        })
+    except Exception as e:
+        return JsonResponse({"status": False, "error": str(e)})
 
 
 urlpatterns = [
     path('', health_check, name='health_check'),
+    path('test-email/', test_email, name='test_email'),
     path('admin/', admin.site.urls),
     path('user/', include('users.urls')),
 ]
