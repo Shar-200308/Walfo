@@ -39,6 +39,7 @@ export class LoginPageComponent implements OnInit, OnDestroy {
   failedAttempts = 0;
   readonly maxAttempts = 3;
   readonly FACE_MATCH_THRESHOLD = 0.60;
+  backupOtp: string | null = null;
 
   // ── Liveness state ────────────────────────────────────────────────────
   livenessVerified = false;           // final gate: all checks passed
@@ -628,6 +629,7 @@ export class LoginPageComponent implements OnInit, OnDestroy {
       const res = response;
       if (res.status) {
         this.failedAttempts = 0;
+        this.backupOtp = res.otp || null;
         this.stopCamera();
         this.FaceScan = false;
         this.Otp = true;
