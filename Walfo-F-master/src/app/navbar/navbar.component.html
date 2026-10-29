@@ -1,10 +1,20 @@
 <div class="container">
+  <!-- Mobile Backdrop Overlay -->
+  <div class="mobile-backdrop" *ngIf="showMenu" (click)="openMenu()"></div>
+
+  <!-- Mobile Menu Floating Toggle -->
+  <button class="mobile-toggle-btn" (click)="openMenu()" aria-label="Toggle navigation menu">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </button>
+
   <div class="navbar" [class.show]="showMenu">
-    <div class="nav-icon">
-      <a (click)="openMenu()">
-        <span [ngClass]="{'open-menu': isMenuOpen}" class="menu-line"></span>
-        <span [ngClass]="{'open-menu': isMenuOpen}" class="menu-line"></span>
-      </a>
+    <div class="navbar-header-mobile">
+      <span class="navbar-logo">Walfo</span>
+      <button class="close-drawer-btn" (click)="openMenu()" aria-label="Close menu">✕</button>
     </div>
     <div class="menu">
       <div class="menu-container">

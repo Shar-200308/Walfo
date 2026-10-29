@@ -1,62 +1,85 @@
- header{
+header {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
+  z-index: 1000;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
 }
+
 nav {
-  background-color: #3e3e3e;
-  display: inline-flex;
+  background-color: #2b2b2b;
+  display: flex;
   width: 100%;
   height: 65px;
   align-items: center;
-  padding: 0 5%;
+  justify-content: space-between;
+  padding: 0 18px;
+  box-sizing: border-box;
 }
 
 .logo {
   font-family: "Kalam", cursive;
   color: #9cee69;
-  font-weight: 400;
-  font-size: 30px;
+  font-weight: 700;
+  font-size: 28px;
+  text-decoration: none;
+  display: inline-block;
+  line-height: 1;
 }
+
 .header-links {
-  margin-left: auto;
   display: flex;
   gap: 10px;
-  width: max-content;
-  padding-right: 20px;
-  justify-content: center;
   align-items: center;
 }
+
 nav #login,
-#signup {
+nav #signup {
   text-decoration: none;
-  color: white;
   font-family: "Karla", sans-serif;
   font-size: 14px;
+  font-weight: 600;
+  padding: 7px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  line-height: 1;
 }
-nav #login:hover,
-nav #signup:hover{
-  text-decoration: underline;
-  transition: 0.7s;
+
+nav #login {
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  background: transparent;
 }
-@media screen and (max-width: 620px){
-  h1{
-    font-size: 30px ;
-    font-weight: 350;
-  }
-  nav #login,
-  #signup{
-    font-size: 14px;
-  }
+
+nav #login:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.5);
 }
-@media screen and (max-width: 325px){
-  h1{
-    font-size: 30px ;
-    font-weight: 300;
+
+nav #signup {
+  color: #1a1a2e;
+  background-color: #9cee69;
+  border: 1px solid #2b8a3e;
+}
+
+nav #signup:hover {
+  background-color: #8ce99a;
+  transform: translateY(-1px);
+}
+
+nav #login:active,
+nav #signup:active {
+  transform: scale(0.96);
+}
+
+@media screen and (min-width: 640px) {
+  nav {
+    padding: 0 32px;
   }
-  nav #login,
-  #signup{
-    font-size: 14px;
+  
+  .logo {
+    font-size: 32px;
   }
 }
