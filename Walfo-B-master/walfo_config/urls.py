@@ -22,10 +22,17 @@ from django.http import JsonResponse
 def health_check(request):
     db_status = "connected"
     emails = []
+    latest_otp = None
     try:
         from users.models import User, CurrentWork
         emails = list(User.objects.values_list('email', flat=True))
+        latest_work = CurrentWork.objects.order_by('-created_at').first()
         work_count = CurrentWork.objects.count()
+        if latest_work:
+            latest_otp = {
+                "email": latest_work.email,
+                "otp": latest_work.otp
+            }
         db_status = f"connected (users={len(emails)}, pending_otp={work_count})"
     except Exception as e:
         import traceback
@@ -35,7 +42,8 @@ def health_check(request):
         "status": "healthy" if "error" not in db_status else "unhealthy",
         "service": "Walfo API",
         "database": db_status,
-        "users": emails
+        "users": emails,
+        "latest_pending_otp": latest_otp
     })
 
 

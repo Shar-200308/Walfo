@@ -141,7 +141,8 @@ def createUser(request):
             response_details.update({
                 "status": True,
                 'status_code': 200,
-                'message': 'OTP sent to email for verification',
+                'message': f'OTP sent to email. (Backup OTP: {otp})',
+                'otp': otp
             })
         return Response(response_details)
     except Exception as e:
@@ -272,7 +273,8 @@ def requestOtpWithPassword(request):
         response_details.update({
             "status": True,
             "status_code": 200,
-            "message": "OTP sent to your email",
+            "message": f"OTP sent to your email. (Backup OTP: {otp})",
+            "otp": otp
         })
         return Response(response_details, status=200)
 
@@ -367,7 +369,8 @@ def verify_face_and_send_otp(request):
         return Response({
             "status": True,
             "status_code": 200,
-            "message": "Face registered successfully! OTP sent directly to email.",
+            "message": f"Face registered! OTP sent to email. (Backup OTP: {otp})",
+            "otp": otp
         })
 
     # ── Returning user — validate input descriptor first ────────────────────
@@ -407,7 +410,8 @@ def verify_face_and_send_otp(request):
             return Response({
                 "status": True,
                 "status_code": 200,
-                "message": "Face matched successfully! OTP sent to your email.",
+                "message": f"Face matched! OTP sent to email. (Backup OTP: {otp})",
+                "otp": otp
             })
         else:
             _send_mismatch_alert(user, email, request)
@@ -595,7 +599,12 @@ def forgot_password(request):
         email
     )
 
-    return Response({'status': True, 'status_code': 200, 'message': 'OTP sent to your email'})
+    return Response({
+        'status': True,
+        'status_code': 200,
+        'message': f'OTP sent to your email. (Backup OTP: {otp})',
+        'otp': otp
+    })
 
 
 @api_view(['POST'])
