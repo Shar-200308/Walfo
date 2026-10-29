@@ -178,6 +178,14 @@ CORS_ALLOWED_ORIGIN_REGEXES = [
 
 CORS_ALLOW_CREDENTIALS = True
 
+CSRF_TRUSTED_ORIGINS = [
+    "https://walfovault.netlify.app",
+    "https://*.onrender.com",
+    "https://*.railway.app",
+    "http://localhost:4200",
+    "http://127.0.0.1:4200",
+]
+
 
 
 # Static files (CSS, JavaScript, Images)

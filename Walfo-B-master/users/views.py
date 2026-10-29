@@ -110,39 +110,49 @@ def _send_email_async(subject: str, message: str, recipient_email: str):
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def createUser(request):
-    response_details = {
-        "status": False,
-        "status_code": 400,
-        "message": 'Error happened while processing',
-    }
-    email = request.data.get('email')
-    if not email:
-        response_details['message'] = 'Email is required'
-        return Response(response_details)
-
-    if User.objects.filter(email=email).exists():
-        response_details.update({
+    try:
+        response_details = {
             "status": False,
             "status_code": 400,
-            "message": "User already exists",
-        })
-    else:
-        CurrentWork.objects.filter(email=email).delete()
-        otp = ''.join(random.choices('0123456789', k=4))
-        CurrentWork.objects.create(email=email, otp=otp)
-        _send_email_async(
-            'Your Walfo account verification code',
-            f'Your Walfo account verification code is {otp}\n\n'
-            f'This code expires in {OTP_EXPIRY_MINUTES} minutes.',
-            email
-        )
+            "message": 'Error happened while processing',
+        }
+        email = request.data.get('email')
+        if not email:
+            response_details['message'] = 'Email is required'
+            return Response(response_details)
 
-        response_details.update({
-            "status": True,
-            'status_code': 200,
-            'message': 'OTP sent to email for verification',
-        })
-    return Response(response_details)
+        if User.objects.filter(email=email).exists():
+            response_details.update({
+                "status": False,
+                "status_code": 400,
+                "message": "User already exists",
+            })
+        else:
+            CurrentWork.objects.filter(email=email).delete()
+            otp = ''.join(random.choices('0123456789', k=4))
+            CurrentWork.objects.create(email=email, otp=otp)
+            _send_email_async(
+                'Your Walfo account verification code',
+                f'Your Walfo account verification code is {otp}\n\n'
+                f'This code expires in {OTP_EXPIRY_MINUTES} minutes.',
+                email
+            )
+
+            response_details.update({
+                "status": True,
+                'status_code': 200,
+                'message': 'OTP sent to email for verification',
+            })
+        return Response(response_details)
+    except Exception as e:
+        print(f"[createUser Error]: {e}")
+        import traceback
+        traceback.print_exc()
+        return Response({
+            "status": False,
+            "status_code": 500,
+            "message": f"Server error: {str(e)}",
+        }, status=500)
 
 
 @api_view(['POST'])
@@ -193,7 +203,7 @@ def verifyOtp(request):
                 )
                 token, _ = Token.objects.get_or_create(user=user)
 
-                send_mail(
+                _send_email_async(
                     'Welcome to Walfo – Your Student Document Vault',
                     f"Hi {name},\n\n"
                     "Thank you for creating an account on Walfo – your trusted vault for securely "
@@ -202,9 +212,7 @@ def verifyOtp(request):
                     "all your important documents in one place.\n\n"
                     "If you have any questions or need support, feel free to reach out.\n\n"
                     "Best regards,\nThe Walfo Team",
-                    settings.DEFAULT_FROM_EMAIL,
-                    [email],
-                    fail_silently=False,
+                    email
                 )
                 otp_entry.delete()
 

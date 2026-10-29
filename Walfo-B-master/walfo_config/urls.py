@@ -20,10 +20,20 @@ from django.http import JsonResponse
 
 
 def health_check(request):
+    db_status = "connected"
+    try:
+        from users.models import User, CurrentWork
+        user_count = User.objects.count()
+        work_count = CurrentWork.objects.count()
+        db_status = f"connected (users={user_count}, pending_otp={work_count})"
+    except Exception as e:
+        import traceback
+        db_status = f"database error: {str(e)} | {traceback.format_exc()}"
+
     return JsonResponse({
-        "status": "healthy",
+        "status": "healthy" if "error" not in db_status else "unhealthy",
         "service": "Walfo API",
-        "version": "1.0.0"
+        "database": db_status
     })
 
 
