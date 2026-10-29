@@ -1,0 +1,43 @@
+
+<div class="body-container">
+  <div class="body-center">
+    <div class="heading-con">
+      <h1>Upload your documents</h1>
+    </div>
+    <form [formGroup]="uploadForm">
+      <div class="text-field-container">
+        <div class="text-field">
+          <label for="title" class="top-name">Document name</label>
+          <input class="input-text" id="title" [formControl]="uploadForm.get('title')">
+          <p class="info-text" *ngIf="uploadForm.get('title').hasError('required') && uploadForm.get('title').touched">This field is required</p>
+        </div>
+        <div class="text-field">
+          <label class="top-name">Upload document</label>
+          <label for="upload-file" class="upload-btn">
+            <svg width="14" height="14" viewBox="0 0 19 19" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <mask id="mask0_164_770" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="0" y="0" width="19" height="19">
+                <rect width="19" height="19" fill="#D9D9D9"/>
+              </mask>
+              <g mask="url(#mask0_164_770)">
+                <path d="M8.70837 12.6668H10.2917V9.34183L11.5584 10.6085L12.6667 9.50016L9.50004 6.3335L6.33337 9.50016L7.44171 10.6085L8.70837 9.34183V12.6668ZM9.50004 17.4168C8.4049 17.4168 7.37573 17.209 6.41254 16.7934C5.44935 16.3778 4.6115 15.8137 3.899 15.1012C3.1865 14.3887 2.62244 13.5509 2.20681 12.5877C1.79119 11.6245 1.58337 10.5953 1.58337 9.50016C1.58337 8.40502 1.79119 7.37586 2.20681 6.41266C2.62244 5.44947 3.1865 4.61162 3.899 3.89912C4.6115 3.18662 5.44935 2.62256 6.41254 2.20693C7.37573 1.79131 8.4049 1.5835 9.50004 1.5835C10.5952 1.5835 11.6243 1.79131 12.5875 2.20693C13.5507 2.62256 14.3886 3.18662 15.1011 3.89912C15.8136 4.61162 16.3776 5.44947 16.7933 6.41266C17.2089 7.37586 17.4167 8.40502 17.4167 9.50016C17.4167 10.5953 17.2089 11.6245 16.7933 12.5877C16.3776 13.5509 15.8136 14.3887 15.1011 15.1012C14.3886 15.8137 13.5507 16.3778 12.5875 16.7934C11.6243 17.209 10.5952 17.4168 9.50004 17.4168ZM9.50004 15.8335C11.2681 15.8335 12.7657 15.22 13.9927 13.9929C15.2198 12.7658 15.8334 11.2682 15.8334 9.50016C15.8334 7.73211 15.2198 6.23454 13.9927 5.00745C12.7657 3.78037 11.2681 3.16683 9.50004 3.16683C7.73198 3.16683 6.23442 3.78037 5.00733 5.00745C3.78025 6.23454 3.16671 7.73211 3.16671 9.50016C3.16671 11.2682 3.78025 12.7658 5.00733 13.9929C6.23442 15.22 7.73198 15.8335 9.50004 15.8335Z" fill="#1C1B1F"/>
+              </g>
+            </svg>
+            Upload
+          </label>
+          <input id="upload-file" type="file" [formControl]="uploadForm.get('document')" (change)="getFile($event)">
+          <p class="info-text" *ngIf="uploadForm.get('document').hasError('required') && uploadForm.get('document').touched">This field is required</p>
+        </div>
+        <div class="btn">
+          <button (click)="createDocument()">
+            Submit
+            <svg xmlns="http://www.w3.org/2000/svg" *ngIf="loader" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid" width="20" height="20" style="shape-rendering: auto; display: block; background: transparent;"><g><circle stroke-dasharray="164.93361431346415 56.97787143782138" r="35" stroke-width="10" stroke="#000" fill="none" cy="50" cx="50">
+              <animateTransform keyTimes="0;1" values="0 50 50;360 50 50" dur="1s" repeatCount="indefinite" type="rotate" attributeName="transform"/>
+            </circle><g/></g>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+<app-toaster #Toaster></app-toaster>

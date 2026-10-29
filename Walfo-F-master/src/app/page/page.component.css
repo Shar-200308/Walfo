@@ -1,0 +1,10 @@
+.container{
+  display: flex;
+}
+.sub-container{
+  width: 100%;
+}
+.sub-container p{
+  text-align: center;
+
+}

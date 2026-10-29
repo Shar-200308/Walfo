@@ -1,0 +1,26 @@
+<div class="body-container">
+  <div class="body-center">
+    <div class="document-container">
+      <h2 class="title-container">My documents</h2>
+      <div class="docs-container">
+        <div *ngIf="show" class="box-container">
+          <div class="card-container" *ngFor="let document of documentsData" (click)="openDialog(document)">
+            <div class="img-container">
+              <img *ngIf="isImage(document.document_url)" src="{{ document.document_url }}" alt="">
+              <img *ngIf="!isImage(document.document_url)" src="/pdf-icon.png" alt="">
+            </div>
+            <div class="name-container">
+              <p> {{ document.title }} </p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div *ngIf="noData" class="nofile">
+        <div class="img-container">
+          <img src="no_datafound.png" alt="">
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<app-dialog #Dialog></app-dialog>

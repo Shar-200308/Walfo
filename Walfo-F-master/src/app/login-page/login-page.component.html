@@ -1,0 +1,181 @@
+<div class="body-container">
+  <div class="body-center">
+
+    <!-- ── Login Form ──────────────────────────────────────────────── -->
+    <div *ngIf="login">
+      <div class="heading-con">
+        <h1>Login</h1>
+      </div>
+      <form [formGroup]="loginForm">
+        <div class="text-field-container">
+          <div class="text-field">
+            <label for="email" class="top-name">Email</label>
+            <input type="email" id="email" class="input-text" [formControl]="$any(loginForm.get('email'))">
+            <p class="info-text" *ngIf="loginForm.get('email').hasError('required') && loginForm.get('email').touched">This field is required</p>
+          </div>
+          <div class="text-field">
+            <label for="password" class="top-name">Password</label>
+            <div class="password-wrapper">
+              <input [type]="showPassword ? 'text' : 'password'" id="password" class="input-text" [formControl]="$any(loginForm.get('password'))">
+              <button type="button" class="password-toggle-btn" (click)="showPassword = !showPassword" aria-label="Toggle password visibility">
+                <svg *ngIf="showPassword" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="eye-icon">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                  <circle cx="12" cy="12" r="3"></circle>
+                </svg>
+                <svg *ngIf="!showPassword" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="eye-icon">
+                  <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+                  <line x1="1" y1="1" x2="23" y2="23"></line>
+                </svg>
+              </button>
+            </div>
+            <p class="info-text" *ngIf="loginForm.get('password').hasError('required') && loginForm.get('password').touched">This field is required</p>
+          </div>
+          <div class="btn">
+            <button (click)="doLogin()">
+              Login
+              <svg xmlns="http://www.w3.org/2000/svg" *ngIf="loader" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid" width="20" height="20" style="shape-rendering: auto; display: block; background: transparent;"><g><circle stroke-dasharray="164.93361431346415 56.97787143782138" r="35" stroke-width="10" stroke="#000" fill="none" cy="50" cx="50">
+                <animateTransform keyTimes="0;1" values="0 50 50;360 50 50" dur="1s" repeatCount="indefinite" type="rotate" attributeName="transform"/>
+              </circle><g/></g>
+              </svg>
+            </button>
+          </div>
+          <div class="bottom-text">
+            <p><a (click)="this.router.navigate(['/forgot-password'])">Forgot Password?</a></p>
+            <p style="margin-top: 8px;">Don't have an account? <a (click)="this.router.navigate(['/signup'])">Signup</a></p>
+          </div>
+        </div>
+      </form>
+    </div>
+
+    <!-- ── Face Scan ───────────────────────────────────────────────── -->
+    <div *ngIf="FaceScan">
+      <div class="heading-con">
+        <h2>Face Verification Required</h2>
+      </div>
+
+      <div class="face-scanner-container" style="border:1px dashed #ccc;padding:10px;border-radius:6px;margin-top:10px;background:#fafafa;">
+        <p style="font-size:13px;text-align:center;margin-bottom:10px;color:#555;">
+          Please scan your face to authorize login.
+        </p>
+
+        <!-- Camera viewport -->
+        <div class="video-container" style="position:relative;width:100%;max-width:320px;height:240px;margin:10px auto;border-radius:8px;overflow:hidden;background:#000;display:flex;align-items:center;justify-content:center;">
+          <video #webcamVideo autoplay muted playsinline style="width:100%;height:100%;object-fit:cover;"></video>
+          <canvas #webcamCanvas style="position:absolute;top:0;left:0;width:100%;height:100%;"></canvas>
+
+          <!-- Loading overlay -->
+          <div *ngIf="loadingModels" class="models-loader" style="position:absolute;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.85);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:10px;font-size:14px;">
+            <div class="spinner" style="border:3px solid rgba(255,255,255,0.3);border-top:3px solid #00c6ff;border-radius:50%;width:30px;height:30px;animation:spin 1s linear infinite;margin-bottom:10px;"></div>
+            <span>Loading face detection models...</span>
+          </div>
+        </div>
+
+        <!-- ── Liveness progress steps ─────────────────────────────── -->
+        <div *ngIf="!loadingModels && isCameraActive" style="margin:10px auto;max-width:320px;">
+
+          <!-- Step indicators -->
+          <div style="display:flex;align-items:center;justify-content:center;gap:6px;margin-bottom:8px;">
+            <!-- Align step -->
+            <div style="display:flex;align-items:center;gap:4px;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:bold;"
+                 [style.background]="alignConfirmed ? '#d4edda' : (livenessStep==='align' ? '#fff3cd' : '#f8f9fa')"
+                 [style.color]="alignConfirmed ? '#155724' : (livenessStep==='align' ? '#856404' : '#6c757d')"
+                 [style.border]="alignConfirmed ? '1px solid #c3e6cb' : (livenessStep==='align' ? '1px solid #ffc107' : '1px solid #dee2e6')">
+              <span>{{ alignConfirmed ? '✅' : (livenessStep==='align' ? '👤' : '⬜') }}</span>
+              <span>Align Face</span>
+            </div>
+
+            <span style="color:#aaa;font-size:12px;">→</span>
+
+            <!-- Turn step -->
+            <div style="display:flex;align-items:center;gap:4px;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:bold;"
+                 [style.background]="headTurnConfirmed ? '#d4edda' : (livenessStep==='turn' ? '#fff3cd' : '#f8f9fa')"
+                 [style.color]="headTurnConfirmed ? '#155724' : (livenessStep==='turn' ? '#856404' : '#6c757d')"
+                 [style.border]="headTurnConfirmed ? '1px solid #c3e6cb' : (livenessStep==='turn' ? '1px solid #ffc107' : '1px solid #dee2e6')">
+              <span>{{ headTurnConfirmed ? '✅' : (targetDirection==='LEFT' ? '👈' : (targetDirection==='RIGHT' ? '👉' : '👆')) }}</span>
+              <span>{{ targetDirection==='UP' ? 'Look UP' : 'Turn ' + targetDirection }}</span>
+            </div>
+
+            <span style="color:#aaa;font-size:12px;">→</span>
+
+            <!-- Verify step -->
+            <div style="display:flex;align-items:center;gap:4px;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:bold;"
+                 [style.background]="livenessVerified ? '#d4edda' : '#f8f9fa'"
+                 [style.color]="livenessVerified ? '#155724' : '#6c757d'"
+                 [style.border]="livenessVerified ? '1px solid #c3e6cb' : '1px solid #dee2e6'">
+              <span>{{ livenessVerified ? '✅' : '🔐' }}</span>
+              <span>Verified</span>
+            </div>
+          </div>
+
+          <!-- Liveness instruction message -->
+          <div style="text-align:center;font-size:12px;font-weight:bold;padding:6px 10px;border-radius:6px;margin-bottom:4px;"
+               [style.color]="livenessVerified ? '#155724' : (faceStatusMessage.includes('Spoof') || faceStatusMessage.includes('shake') ? '#721c24' : '#2c3e50')"
+               [style.background]="livenessVerified ? '#d4edda' : (faceStatusMessage.includes('Spoof') || faceStatusMessage.includes('shake') ? '#f8d7da' : 'transparent')">
+            <span *ngIf="livenessVerified">&#9989;</span>
+            <span *ngIf="!livenessVerified && (faceStatusMessage.includes('Spoof') || faceStatusMessage.includes('shake'))">&#128683;</span>
+            {{ faceStatusMessage }}
+          </div>
+
+        </div>
+
+        <!-- Lockdown status banner on face mismatch -->
+        <div *ngIf="mismatchBlocked" style="padding:10px 14px;background:#f8d7da;color:#721c24;border:1px solid #f5c6cb;border-radius:8px;text-align:center;font-weight:bold;margin:10px auto;max-width:320px;font-size:12px;">
+          🚨 SECURITY LOCKDOWN: Face mismatch detected! An alert email containing your captured photo has been sent to the account owner. Verification is blocked for this session.
+        </div>
+
+        <!-- Fallback status for non-liveness states -->
+        <div *ngIf="(!isCameraActive || loadingModels) && !mismatchBlocked" class="face-status"
+             [style.color]="faceDetected ? '#2ecc71' : '#e74c3c'"
+             style="text-align:center;font-size:13px;font-weight:bold;margin-bottom:15px;">
+          {{ faceStatusMessage }}
+        </div>
+
+        <!-- Action buttons -->
+        <div style="display:flex;gap:10px;justify-content:center;margin-bottom:10px;">
+          <button type="button" (click)="toggleCamera()" [disabled]="mismatchBlocked" style="padding:6px 12px;background:#6c757d;color:white;border:none;border-radius:4px;cursor:pointer;font-size:12px;" [style.opacity]="mismatchBlocked ? '0.5' : '1'">
+            {{ isCameraActive ? 'Turn Off Camera' : 'Turn On Camera' }}
+          </button>
+
+          <button type="button"
+                  [disabled]="!faceDetected || !livenessVerified || loader || mismatchBlocked"
+                  (click)="verifyFace()"
+                  [title]="mismatchBlocked ? 'Session blocked due to face mismatch' : (!livenessVerified ? 'Complete directional challenge first' : 'Click to verify your face')"
+                  style="padding:6px 12px;color:white;border:none;border-radius:4px;cursor:pointer;font-size:12px;font-weight:bold;display:flex;align-items:center;gap:5px;transition:background 0.3s;"
+                  [style.background]="livenessVerified && !mismatchBlocked ? '#28a745' : '#adb5bd'"
+                  [style.cursor]="livenessVerified && !mismatchBlocked ? 'pointer' : 'not-allowed'">
+            Verify Face
+            <span *ngIf="livenessVerified && !mismatchBlocked" style="font-size:10px;">✓</span>
+            <svg xmlns="http://www.w3.org/2000/svg" *ngIf="loader" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid" width="14" height="14" style="shape-rendering:auto;display:block;background:transparent;"><g><circle stroke-dasharray="164.93361431346415 56.97787143782138" r="35" stroke-width="10" stroke="#fff" fill="none" cy="50" cx="50">
+              <animateTransform keyTimes="0;1" values="0 50 50;360 50 50" dur="1s" repeatCount="indefinite" type="rotate" attributeName="transform"/>
+            </circle><g/></g>
+            </svg>
+          </button>
+        </div>
+
+        <button type="button" (click)="cancelFaceScan()" style="display:block;margin:10px auto 0 auto;background:transparent;border:none;color:#dc3545;font-size:12px;cursor:pointer;text-decoration:underline;">
+          Cancel &amp; Back
+        </button>
+      </div>
+    </div>
+
+    <!-- ── OTP Form ────────────────────────────────────────────────── -->
+    <div *ngIf="Otp">
+      <div class="heading-con">
+        <h2>Please enter the OTP which send to your email</h2>
+      </div>
+      <div class="otp-container">
+        <input type="text" class="input-otp" maxlength="1" [formControl]="otpForm.get('otp1')" (input)="onInput($event, otp1, otp2)" (keydown)="onKeyDown($event, otp1)" #otp1 />
+        <input type="text" class="input-otp" maxlength="1" [formControl]="otpForm.get('otp2')" (input)="onInput($event, otp2, otp3)" (keydown)="onKeyDown($event, otp2, otp1)" #otp2 />
+        <input type="text" class="input-otp" maxlength="1" [formControl]="otpForm.get('otp3')" (input)="onInput($event, otp3, otp4)" (keydown)="onKeyDown($event, otp3, otp2)" #otp3 />
+        <input type="text" class="input-otp" maxlength="1" [formControl]="otpForm.get('otp4')" (input)="onInput($event, otp4)" (keydown)="onKeyDown($event, otp4, otp3)" #otp4 />
+      </div>
+      <div class="btn top">
+        <button [disabled]="!otpForm.valid || verifyingOtp" (click)="verifyOtp()">
+          {{ verifyingOtp ? 'Verifying...' : 'Submit' }}
+        </button>
+      </div>
+    </div>
+
+  </div>
+</div>
+<app-toaster #toaster></app-toaster>

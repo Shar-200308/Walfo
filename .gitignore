@@ -1,0 +1,28 @@
+# Environment secrets
+.env
+*.env
+**/.env
+
+# Python / Virtual Environment
+.venv/
+venv/
+ENV/
+**/__pycache__/
+*.py[cod]
+*.sqlite3
+*.sqlite3.bak
+*.sqliteAA
+*.sqbpro
+staticfiles/
+
+# Node / Angular
+node_modules/
+**/node_modules/
+dist/
+**/.angular/cache/
+
+# IDE & OS
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db

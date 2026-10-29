@@ -1,0 +1,93 @@
+<div class="body-container">
+  <div class="body-center">
+    <div *ngIf="Signup">
+      <div class="heading-con">
+        <h1>Signup</h1>
+      </div>
+      <form [formGroup]="signupForm">
+        <div class="text-field-container">
+          <div class="text-field">
+            <label for="name" class="top-name">Name</label>
+            <input type="text" id="name" class="input-text" [formControl]="$any(signupForm.get('name'))">
+            <p class="info-text" *ngIf="signupForm.get('name').hasError('required') && signupForm.get('name').touched">This field is required</p>
+          </div>
+          <div class="text-field">
+            <label for="email" class="top-name">Email</label>
+            <input type="email" id="email" class="input-text" [formControl]="$any(signupForm.get('email'))">
+            <p class="info-text" *ngIf="signupForm.get('email').hasError('required') && signupForm.get('email').touched">This field is required</p>
+          </div>
+          <div class="text-field">
+            <label for="password" class="top-name">Password</label>
+            <div class="password-wrapper">
+              <input [type]="showPassword ? 'text' : 'password'" id="password" class="input-text" [formControl]="$any(signupForm.get('password'))">
+              <button type="button" class="password-toggle-btn" (click)="showPassword = !showPassword" aria-label="Toggle password visibility">
+                <svg *ngIf="showPassword" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="eye-icon">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                  <circle cx="12" cy="12" r="3"></circle>
+                </svg>
+                <svg *ngIf="!showPassword" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="eye-icon">
+                  <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+                  <line x1="1" y1="1" x2="23" y2="23"></line>
+                </svg>
+              </button>
+            </div>
+            <p class="info-text" *ngIf="signupForm.get('password').hasError('required') && signupForm.get('password').touched">This field is required</p>
+          </div>
+
+          <!-- Face Scanner section -->
+          <div class="face-scanner-container">
+            <label class="top-name">Face Registration</label>
+            <div class="video-container" style="position: relative; width: 100%; max-width: 320px; height: 240px; margin: 10px auto; border-radius: 8px; overflow: hidden; background: #000; display: flex; align-items: center; justify-content: center;">
+              <video #webcamVideo autoplay muted playsinline style="width: 100%; height: 100%; object-fit: cover;"></video>
+              <canvas #webcamCanvas style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"></canvas>
+              
+              <!-- Loader overlay when models loading -->
+              <div *ngIf="loadingModels" class="models-loader" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); color: #fff; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 10px; font-size: 14px;">
+                <div class="spinner" style="border: 3px solid rgba(255,255,255,0.3); border-top: 3px solid #00c6ff; border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; margin-bottom: 10px;"></div>
+                <span>Loading face detection models...</span>
+              </div>
+            </div>
+            <div class="face-status" [style.color]="faceDetected ? '#2ecc71' : '#e74c3c'" style="text-align: center; font-size: 13px; font-weight: bold; margin-bottom: 10px;">
+              {{ faceStatusMessage }}
+            </div>
+            
+            <button type="button" (click)="toggleCamera()" style="display: block; margin: 0 auto 15px auto; padding: 6px 12px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px;">
+              {{ isCameraActive ? 'Turn Off Camera' : 'Turn On Camera' }}
+            </button>
+          </div>
+
+          <div class="btn">
+            <button (click)="doSignup()">
+              Signup
+              <svg xmlns="http://www.w3.org/2000/svg" *ngIf="loader" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid" width="20" height="20" style="shape-rendering: auto; display: block; background: transparent;"><g><circle stroke-dasharray="164.93361431346415 56.97787143782138" r="35" stroke-width="10" stroke="#000" fill="none" cy="50" cx="50">
+                <animateTransform keyTimes="0;1" values="0 50 50;360 50 50" dur="1s" repeatCount="indefinite" type="rotate" attributeName="transform"/>
+              </circle><g/></g>
+              </svg>
+            </button>
+          </div>
+          <div class="bottom-text">
+            <p>Already have an account? <a (click)="this.router.navigate(['/login'])">Login</a></p>
+          </div>
+        </div>
+      </form>
+    </div>
+    <div *ngIf="Otp">
+      <div class="heading-con">
+        <h2>Please enter the OTP which send to your email</h2>
+      </div>
+      <div class="otp-container">
+        <input type="text" class="input-otp" maxlength="1" [formControl]="otpForm.get('otp1')" (input)="onInput($event, otp1, otp2)" (keydown)="onKeyDown($event, otp1)" #otp1 />
+        <input type="text" class="input-otp" maxlength="1" [formControl]="otpForm.get('otp2')" (input)="onInput($event, otp2, otp3)" (keydown)="onKeyDown($event, otp2, otp1)" #otp2 />
+        <input type="text" class="input-otp" maxlength="1" [formControl]="otpForm.get('otp3')" (input)="onInput($event, otp3, otp4)" (keydown)="onKeyDown($event, otp3, otp2)" #otp3 />
+        <input type="text" class="input-otp" maxlength="1" [formControl]="otpForm.get('otp4')" (input)="onInput($event, otp4)" (keydown)="onKeyDown($event, otp4, otp3)" #otp4 />
+      </div>
+      <div class="btn top">
+        <button [disabled]="!otpForm.valid || verifyingOtp" (click)="verifyOtp()">
+          {{ verifyingOtp ? 'Verifying...' : 'Submit' }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+<app-toaster #Toaster></app-toaster>
+<app-welcome-page *ngIf="welcome"></app-welcome-page>

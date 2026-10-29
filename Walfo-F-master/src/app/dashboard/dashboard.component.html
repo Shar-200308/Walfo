@@ -1,0 +1,94 @@
+<div class="body-container">
+  <div class="body-center">
+    <div class="search-container">
+      <svg width="18" height="18" viewBox="0 0 27 23" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M23.625 20.125L18.7312 15.9562M21.375 10.5417C21.375 14.7758 17.3456 18.2083 12.375 18.2083C7.40444 18.2083 3.375 14.7758 3.375 10.5417C3.375 6.30748 7.40444 2.875 12.375 2.875C17.3456 2.875 21.375 6.30748 21.375 10.5417Z" stroke="#6E6B6B" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <input type="search" class="input-search" placeholder="Search document"/>
+    </div>
+    <div class="profile-and-stats">
+      <div class="user-profile-card" *ngIf="userName">
+        <div class="profile-img-wrapper">
+          <!-- Face image shown if exists -->
+          <img *ngIf="faceImage" [src]="faceImage" alt="User Face Photo" class="profile-face">
+          <!-- Placeholder if no face -->
+          <div *ngIf="!faceImage" class="profile-face-placeholder">
+            <svg viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+            </svg>
+          </div>
+        </div>
+        <div class="profile-info">
+          <h2 class="user-name">{{ userName }}</h2>
+          <p class="user-email">{{ userEmail }}</p>
+          <div class="user-meta">
+            <span class="meta-label">User ID:</span>
+            <span class="meta-value">{{ userId }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="totaldocuments">
+        <div class="para-container">
+          <p>Total documents</p>
+          <span class="doc-count"> {{ count }} </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Face Camera Modal ───────────────────────────────────────────── -->
+    <div class="face-modal-overlay" *ngIf="showFaceCamera" (click)="closeFaceCamera()">
+      <div class="face-modal" (click)="$event.stopPropagation()">
+        <div class="face-modal-header">
+          <h3>{{ faceImage ? 'Update Face Photo' : 'Add Face Photo' }}</h3>
+          <button class="close-btn" (click)="closeFaceCamera()">✕</button>
+        </div>
+
+        <div class="video-wrapper">
+          <video #webcamVideo autoplay muted playsinline class="webcam-video"></video>
+          <canvas #webcamCanvas class="webcam-canvas"></canvas>
+          <div *ngIf="loadingModels" class="models-loader">
+            <div class="spinner"></div>
+            <span>Loading face detection...</span>
+          </div>
+        </div>
+
+        <p class="face-status" [class.detected]="faceDetected" [class.not-detected]="!faceDetected">
+          {{ faceStatusMessage }}
+        </p>
+
+        <div class="face-modal-actions">
+          <button class="save-face-btn" [disabled]="!faceDetected || savingFace" (click)="saveFace()">
+            {{ savingFace ? 'Saving...' : 'Save Face Photo' }}
+          </button>
+          <button class="cancel-face-btn" (click)="closeFaceCamera()">Cancel</button>
+        </div>
+      </div>
+    </div>
+    <!-- ──────────────────────────────────────────────────────────────── -->
+
+    <div class="upload-files">
+      <p>Recently uploaded </p>
+      <div *ngIf="show" class="file-container">
+        <div class="card-container">
+          <div class="card" *ngFor="let document of documentsData" (click)="delete(document)">
+            <div class="img-container">
+              <img *ngIf="isImage(document.document)" src="{{ document.document_url }}" alt="image preview">
+              <img *ngIf="!isImage(document.document)" src="/pdf-icon.png" alt="pdf icon">
+            </div>
+            <div class="filename">
+              <p> {{ document.title }} </p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div *ngIf="noData" class="nofile">
+        <div class="img-container">
+          <img src="no_datafound.png" alt="">
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<app-dialog #Dialog></app-dialog>
+<app-toaster #toaster></app-toaster>

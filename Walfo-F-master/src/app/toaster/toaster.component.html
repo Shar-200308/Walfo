@@ -1,0 +1,31 @@
+<div class="toaster-container" *ngIf="toaster">
+  <div class="toaster" [ngStyle]="{'border-color': isRed ? 'red': '#4BEA36'}">
+    <div class="close">
+      <button (click)="close()">&times;</button>
+    </div>
+    <div class="icon">
+      <svg width="45" *ngIf="sIcon" height="45" viewBox="0 0 159 133" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M66.25 90.6266L39.75 68.5226L49.025 60.7862L66.25 75.1538L109.975 38.6821L119.25 46.4185L66.25 90.6266Z" fill="#4BEA36"/>
+        <g clip-path="url(#clip0_101_48)">
+          <circle cx="68.2393" cy="65.6492" r="33" stroke="#4BEA36" />
+        </g>
+        <defs>
+          <clipPath id="clip0_101_48"><rect width="89.521" height="88.8583" fill="white" transform="translate(34.7393 21.22)"/></clipPath>
+        </defs>
+      </svg>
+      <svg width="32" *ngIf="!sIcon" height="32" viewBox="0 0 74 68" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="36.5" cy="33.5" r="33" stroke="#FF0000"/>
+        <path d="M19.7334 53.8332L15.4167 49.8665L32.6834 33.9998L15.4167 18.1332L19.7334 14.1665L37.0001 30.0332L54.2667 14.1665L58.5834 18.1332L41.3167 33.9998L58.5834 49.8665L54.2667 53.8332L37.0001 37.9665L19.7334 53.8332Z" fill="#FF3B30"/>
+      </svg>
+    </div>
+    <div class="words">
+      <div id="success">
+        <h1 [ngStyle]="{'color': isRed ? 'red': '#4BEA36'}">{{ title }}</h1>
+      </div>
+      <div id="word-container">
+        <p [ngStyle]="{'color': isRed ? 'red': '#4BEA36'}"> {{ message }}</p>
+      </div>
+    </div>
+    <!--    <div class="line"></div>-->
+  </div>
+</div>

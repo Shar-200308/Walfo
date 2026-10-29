@@ -1,0 +1,122 @@
+.full-container{
+  height: 100dvh;
+  width: 100%;
+  position: fixed;
+  z-index: 100000;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+.dialog-container{
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  padding: 1rem;
+  background-color: #fff;
+  border-radius: 8px;
+  width: 90vw;
+}
+.sub-container{
+  position: relative;
+}
+.close{
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+.close button{
+  all: unset;
+  font-size: 2rem;
+  font-weight: 300;
+  cursor: pointer;
+  line-height: 0.5;
+  color: gray;
+}
+.close button:hover{
+  color: #000;
+}
+.content-container{
+  max-height: 75dvh;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.content-container{
+  width: 100%;
+  height: 100%;
+}
+.content img{
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+.btns{
+  margin-top: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2rem;
+}
+.btn{
+  font-size: 0.85rem;
+  border: 0.5px solid #000;
+  background-color: #9cee69;
+  padding: 5px 10px;
+  border-radius: 3px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+}
+.delete{
+  color: #fff;
+  background-color: #FF4242;
+}
+.pdf{
+  display: block;
+  width: 70vw;
+  height: 60vh;
+  border: 1px solid #000;
+}
+
+
+
+@media screen and (min-width: 640px) {
+  .dialog-container{
+    width: 60vw;
+  }
+  .pdf{
+    width: 50vw;
+  }
+}
+@media screen and (min-width: 1024px) {
+  .dialog-container{
+    width: 50vw;
+  }
+  .pdf{
+    width: 42vw;
+  }
+}
+@media screen and (min-width: 1280px) {
+  .dialog-container{
+    width: 40vw;
+  }
+  .pdf{
+    width: 33vw;
+    height: 75dvh;
+  }
+}
+@media screen and (min-width: 1400px) {
+  .dialog-container{
+    width: 40vw;
+  }
+  .pdf{
+    width: 35vw;
+  }
+}
+

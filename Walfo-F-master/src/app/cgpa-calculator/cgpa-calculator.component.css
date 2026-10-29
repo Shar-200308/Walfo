@@ -1,0 +1,93 @@
+.body-container {
+  width: 100%;
+  min-height: 100vh;
+  padding-top: 65px;
+  background-color: rgba(246, 246, 246, 1);
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+.body-center {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  padding: 30px 16px;
+}
+
+.text-field {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.calculator-container {
+  width: 100%;
+  max-width: 480px;
+  margin-top: 20px;
+  padding: 24px;
+  border: 2px solid #ccc;
+  border-radius: 8px;
+  background: #f9f9f9;
+}
+
+h2 {
+  text-align: center;
+  margin-bottom: 15px;
+}
+
+.subject-row {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.subject-row input {
+  flex: 1;
+  padding: 8px;
+  border: 1px solid #999;
+  border-radius: 4px;
+}
+
+.delete-btn {
+  background-color: transparent;
+  color: #dc3545;
+  border: 1px solid #dc3545;
+  padding: 0 12px;
+  height: 38px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 0.85rem;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.delete-btn:hover {
+  background-color: #dc3545;
+  color: white;
+}
+
+.buttons {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 10px;
+}
+
+button {
+  font-size: 0.85rem;
+  border: 0.5px solid #000;
+  background-color: #9cee69;
+  padding: 8px 18px;
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+.result {
+  margin-top: 15px;
+  text-align: center;
+  font-size: 18px;
+  color: #333;
+}
