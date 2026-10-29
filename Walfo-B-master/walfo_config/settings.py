@@ -32,7 +32,7 @@ DEBUG = os.environ.get('DEBUG', 'True').strip().lower() == 'true'
 
 ALLOWED_HOSTS = [
     h.strip()
-    for h in os.environ.get('ALLOWED_HOSTS', '127.0.0.1,localhost').split(',')
+    for h in os.environ.get('ALLOWED_HOSTS', '127.0.0.1,localhost,.railway.app,.onrender.com').split(',')
     if h.strip()
 ]
 
@@ -199,5 +199,6 @@ EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', 'walfowallet@gmail.com')
-EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '')
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '').replace(' ', '').strip()
+EMAIL_TIMEOUT = 10
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
