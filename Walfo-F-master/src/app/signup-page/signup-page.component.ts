@@ -52,7 +52,8 @@ export class SignupPageComponent implements OnInit, OnDestroy {
   }
 
   async ngOnInit() {
-    // Models are loaded lazily when camera is first needed (in doSignup)
+    // Automatically load face detection models and start camera on page open
+    await this.loadModels();
   }
 
   ngOnDestroy() {
@@ -137,7 +138,11 @@ export class SignupPageComponent implements OnInit, OnDestroy {
     if (this.isCameraActive) {
       this.stopCamera();
     } else {
-      this.startCamera();
+      if (!faceapi?.nets?.ssdMobilenetv1?.isLoaded) {
+        this.loadModels();
+      } else {
+        this.startCamera();
+      }
     }
   }
 
@@ -157,32 +162,41 @@ export class SignupPageComponent implements OnInit, OnDestroy {
         clearInterval(this.faceDetectionInterval);
       }
 
+      let isDetecting = false;
+
       this.faceDetectionInterval = setInterval(async () => {
-        if (!this.isCameraActive || video.paused || video.ended) return;
+        if (isDetecting || !this.isCameraActive || video.paused || video.ended) return;
 
-        const detection = await faceapi.detectSingleFace(video)
-          .withFaceLandmarks()
-          .withFaceDescriptor();
+        isDetecting = true;
+        try {
+          const detection = await faceapi.detectSingleFace(video)
+            .withFaceLandmarks()
+            .withFaceDescriptor();
 
-        const ctx = canvas.getContext('2d');
-        ctx?.clearRect(0, 0, canvas.width, canvas.height);
+          const ctx = canvas.getContext('2d');
+          ctx?.clearRect(0, 0, canvas.width, canvas.height);
 
-        if (detection) {
-          this.faceDetected = true;
-          this.faceStatusMessage = 'Face detected! Ready to signup.';
+          if (detection) {
+            this.faceDetected = true;
+            this.faceStatusMessage = 'Face detected! Ready to signup.';
 
-          const resizedDetections = faceapi.resizeResults(detection, displaySize);
-          faceapi.draw.drawDetections(canvas, resizedDetections);
+            const resizedDetections = faceapi.resizeResults(detection, displaySize);
+            faceapi.draw.drawDetections(canvas, resizedDetections);
 
-          this.faceDescriptor = Array.from(detection.descriptor);
-          this.captureBase64Frame(video);
-        } else {
-          this.faceDetected = false;
-          this.faceDescriptor = null;
-          this.faceImageBase64 = null;
-          this.faceStatusMessage = 'Looking for face... Please align your face in camera view.';
+            this.faceDescriptor = Array.from(detection.descriptor);
+            this.captureBase64Frame(video);
+          } else {
+            this.faceDetected = false;
+            this.faceDescriptor = null;
+            this.faceImageBase64 = null;
+            this.faceStatusMessage = 'Looking for face... Please align your face in camera view.';
+          }
+        } catch (err) {
+          console.error('Face detection frame error:', err);
+        } finally {
+          isDetecting = false;
         }
-      }, 300);
+      }, 200);
     };
 
     video.addEventListener('play', this.playHandler);
