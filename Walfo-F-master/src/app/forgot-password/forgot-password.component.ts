@@ -65,10 +65,10 @@ export class ForgotPasswordComponent {
         this.toaster.isRed = true;
         this.toaster.showToaster();
       }
-    }, () => {
+    }, (error: any) => {
       this.loader = false;
       this.toaster.title = 'Error';
-      this.toaster.message = 'Something went wrong. Please try again.';
+      this.toaster.message = error?.error?.message || 'Something went wrong. Please try again.';
       this.toaster.sIcon = false;
       this.toaster.isRed = true;
       this.toaster.showToaster();

@@ -109,15 +109,19 @@ def createUser(request):
     else:
         CurrentWork.objects.filter(email=email).delete()
         otp = ''.join(random.choices('0123456789', k=4))
-        send_mail(
-            'Your Walfo account verification code',
-            f'Your Walfo account verification code is {otp}\n\n'
-            f'This code expires in {OTP_EXPIRY_MINUTES} minutes.',
-            settings.DEFAULT_FROM_EMAIL,
-            [email],
-            fail_silently=False,
-        )
         CurrentWork.objects.create(email=email, otp=otp)
+        try:
+            send_mail(
+                'Your Walfo account verification code',
+                f'Your Walfo account verification code is {otp}\n\n'
+                f'This code expires in {OTP_EXPIRY_MINUTES} minutes.',
+                settings.DEFAULT_FROM_EMAIL,
+                [email],
+                fail_silently=True,
+            )
+        except Exception as mail_err:
+            print(f"[Email Error in createUser]: {mail_err}")
+
         response_details.update({
             "status": True,
             'status_code': 200,
@@ -235,15 +239,17 @@ def requestOtpWithPassword(request):
         CurrentWork.objects.filter(email=email).delete()
         otp = ''.join(random.choices('0123456789', k=4))
         CurrentWork.objects.create(email=email, otp=otp)
-
-        send_mail(
-            'Your Walfo OTP Code',
-            f'Your login OTP code is: {otp}\n\n'
-            f'This code expires in {OTP_EXPIRY_MINUTES} minutes.',
-            settings.DEFAULT_FROM_EMAIL,
-            [email],
-            fail_silently=False,
-        )
+        try:
+            send_mail(
+                'Your Walfo OTP Code',
+                f'Your login OTP code is: {otp}\n\n'
+                f'This code expires in {OTP_EXPIRY_MINUTES} minutes.',
+                settings.DEFAULT_FROM_EMAIL,
+                [email],
+                fail_silently=True,
+            )
+        except Exception as mail_err:
+            print(f"[Email Error in requestOtpWithPassword]: {mail_err}")
 
         response_details.update({
             "status": True,
@@ -334,13 +340,17 @@ def verify_face_and_send_otp(request):
         CurrentWork.objects.filter(email=email).delete()
         otp = ''.join(random.choices('0123456789', k=4))
         CurrentWork.objects.create(email=email, otp=otp)
-        send_mail(
-            'Your Walfo OTP Code',
-            f'Your login OTP code is: {otp}\n\nThis code expires in {OTP_EXPIRY_MINUTES} minutes.',
-            settings.DEFAULT_FROM_EMAIL,
-            [email],
-            fail_silently=False,
-        )
+        try:
+            send_mail(
+                'Your Walfo OTP Code',
+                f'Your login OTP code is: {otp}\n\nThis code expires in {OTP_EXPIRY_MINUTES} minutes.',
+                settings.DEFAULT_FROM_EMAIL,
+                [email],
+                fail_silently=True,
+            )
+        except Exception as mail_err:
+            print(f"[Email Error in verify_face_and_send_otp]: {mail_err}")
+
         return Response({
             "status": True,
             "status_code": 200,
@@ -375,13 +385,17 @@ def verify_face_and_send_otp(request):
             CurrentWork.objects.filter(email=email).delete()
             otp = ''.join(random.choices('0123456789', k=4))
             CurrentWork.objects.create(email=email, otp=otp)
-            send_mail(
-                'Your Walfo OTP Code',
-                f'Your login OTP code is: {otp}\n\nThis code expires in {OTP_EXPIRY_MINUTES} minutes.',
-                settings.DEFAULT_FROM_EMAIL,
-                [email],
-                fail_silently=False,
-            )
+            try:
+                send_mail(
+                    'Your Walfo OTP Code',
+                    f'Your login OTP code is: {otp}\n\nThis code expires in {OTP_EXPIRY_MINUTES} minutes.',
+                    settings.DEFAULT_FROM_EMAIL,
+                    [email],
+                    fail_silently=True,
+                )
+            except Exception as mail_err:
+                print(f"[Email Error in verify_face_and_send_otp match]: {mail_err}")
+
             return Response({
                 "status": True,
                 "status_code": 200,
@@ -564,17 +578,21 @@ def forgot_password(request):
     otp = ''.join(random.choices('0123456789', k=4))
     CurrentWork.objects.create(email=email, otp=otp)
 
-    send_mail(
-        'Walfo - Password Reset OTP',
-        f'Hi {user.name},\n\n'
-        f'Your OTP to reset your Walfo password is: {otp}\n\n'
-        f'This OTP expires in {OTP_EXPIRY_MINUTES} minutes. '
-        'If you did not request this, ignore this email.\n\n'
-        'Best regards,\nThe Walfo Team',
-        settings.DEFAULT_FROM_EMAIL,
-        [email],
-        fail_silently=False,
-    )
+    try:
+        send_mail(
+            'Walfo - Password Reset OTP',
+            f'Hi {user.name},\n\n'
+            f'Your OTP to reset your Walfo password is: {otp}\n\n'
+            f'This OTP expires in {OTP_EXPIRY_MINUTES} minutes. '
+            'If you did not request this, ignore this email.\n\n'
+            'Best regards,\nThe Walfo Team',
+            settings.DEFAULT_FROM_EMAIL,
+            [email],
+            fail_silently=True,
+        )
+    except Exception as mail_err:
+        print(f"[Email Error in forgot_password]: {mail_err}")
+
     return Response({'status': True, 'status_code': 200, 'message': 'OTP sent to your email'})
 
 
