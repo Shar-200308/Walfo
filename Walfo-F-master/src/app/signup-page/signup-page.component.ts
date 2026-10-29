@@ -233,26 +233,35 @@ export class SignupPageComponent implements OnInit, OnDestroy {
         return;
       }
       const formData = this.signupForm.value;
-      this.web.createUser(formData).subscribe((response: any) => {
-        const res = response;
-        if(res.status){
-          this.toaster.title = 'Success';
-          this.toaster.message = res.message;
-          this.toaster.isRed = false;
-          this.toaster.sIcon = true;
-          this.toaster.showToaster();
-          this.Signup = false;
-          this.Otp = true;
+      this.web.createUser(formData).subscribe({
+        next: (response: any) => {
           this.loader = false;
-        }else{
+          const res = response;
+          if(res.status){
+            this.toaster.title = 'Success';
+            this.toaster.message = res.message;
+            this.toaster.isRed = false;
+            this.toaster.sIcon = true;
+            this.toaster.showToaster();
+            this.Signup = false;
+            this.Otp = true;
+          }else{
+            this.toaster.title = 'Error';
+            this.toaster.message = res.message;
+            this.toaster.isRed = true;
+            this.toaster.sIcon = false;
+            this.toaster.showToaster();
+          }
+        },
+        error: (err: any) => {
+          this.loader = false;
           this.toaster.title = 'Error';
-          this.toaster.message = res.message;
+          this.toaster.message = err?.error?.message || 'Server error or request timed out. Please try again.';
           this.toaster.isRed = true;
           this.toaster.sIcon = false;
           this.toaster.showToaster();
-          this.loader = false;
         }
-      })
+      });
     }
     else {
       this.signupForm.markAllAsTouched();
@@ -271,35 +280,44 @@ export class SignupPageComponent implements OnInit, OnDestroy {
       'face_descriptor': this.faceDescriptor,
       'face_image': this.faceImageBase64
     }
-    this.web.verifyOtp(data).subscribe((response: any) => {
-      const res = response;
-      if(res.status){
+    this.web.verifyOtp(data).subscribe({
+      next: (response: any) => {
         this.verifyingOtp = false;
-        this.stopCamera();
-        this.toaster.title = 'Success';
-        this.toaster.message = res.message;
-        this.toaster.isRed = false;
-        this.toaster.sIcon = true;
-        this.toaster.showToaster();
-        localStorage.setItem('studentToken',res.token)
-        localStorage.setItem('nickname', this.signupForm.value.name)
-        localStorage.setItem('user_id', res.user_id)
-        setTimeout(()=>{
-          this.welcome = true;
-        },1000);
-        setTimeout(()=>{
-          this.welcome = false;
-          this.router.navigate(['/dashboard']);
-        },3000)
-      }else {
+        const res = response;
+        if(res.status){
+          this.stopCamera();
+          this.toaster.title = 'Success';
+          this.toaster.message = res.message;
+          this.toaster.isRed = false;
+          this.toaster.sIcon = true;
+          this.toaster.showToaster();
+          localStorage.setItem('studentToken',res.token)
+          localStorage.setItem('nickname', this.signupForm.value.name)
+          localStorage.setItem('user_id', res.user_id)
+          setTimeout(()=>{
+            this.welcome = true;
+          },1000);
+          setTimeout(()=>{
+            this.welcome = false;
+            this.router.navigate(['/dashboard']);
+          },3000)
+        }else {
+          this.toaster.title = 'Error';
+          this.toaster.message = res.message;
+          this.toaster.isRed = true;
+          this.toaster.sIcon = false;
+          this.toaster.showToaster();
+        }
+      },
+      error: (err: any) => {
         this.verifyingOtp = false;
         this.toaster.title = 'Error';
-        this.toaster.message = res.message;
+        this.toaster.message = err?.error?.message || 'Verification failed. Please check OTP and try again.';
         this.toaster.isRed = true;
         this.toaster.sIcon = false;
         this.toaster.showToaster();
       }
-    })
+    });
   }
 
   @ViewChild('otp1', { static: false }) otp1!: ElementRef<HTMLInputElement>;
