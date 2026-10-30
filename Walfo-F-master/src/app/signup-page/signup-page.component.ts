@@ -21,7 +21,6 @@ export class SignupPageComponent implements OnInit, OnDestroy {
   loader = false;
   verifyingOtp = false;
   showPassword = false;
-  backupOtp: string | null = null;
 
   loadingModels = true;
   faceStatusMessage = 'Initializing camera...';
@@ -249,7 +248,6 @@ export class SignupPageComponent implements OnInit, OnDestroy {
             this.toaster.isRed = false;
             this.toaster.sIcon = true;
             this.toaster.showToaster();
-            this.backupOtp = res.otp || null;
             this.Signup = false;
             this.Otp = true;
           }else{

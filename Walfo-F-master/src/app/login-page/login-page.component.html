@@ -162,10 +162,6 @@
     <div *ngIf="Otp">
       <div class="heading-con">
         <h2>Please enter the OTP sent to your email</h2>
-        <div *ngIf="backupOtp" style="margin: 12px auto; text-align: center; max-width: 280px; background: #e8f8f0; border: 1px solid #2ecc71; border-radius: 8px; padding: 10px 14px;">
-          <span style="font-size: 13px; color: #27ae60; font-weight: 500;">Your Verification OTP:</span>
-          <div style="font-size: 26px; font-weight: 800; letter-spacing: 6px; color: #1e824c; margin-top: 4px;">{{ backupOtp }}</div>
-        </div>
       </div>
       <div class="otp-container">
         <input type="text" class="input-otp" maxlength="1" [formControl]="otpForm.get('otp1')" (input)="onInput($event, otp1, otp2)" (keydown)="onKeyDown($event, otp1)" #otp1 />

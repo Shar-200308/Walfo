@@ -37,6 +37,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
   private playHandler: (() => void) | null = null;
 
   public documentsData: any[] = [];
+  public allDocuments: any[] = [];
+  public searchTerm = '';
   totalDocuments = 0;
   currentPage = 1;
   readonly PAGE_SIZE = 20;
@@ -67,14 +69,26 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.web.getDocuments(page, this.PAGE_SIZE).subscribe((response: any) => {
       const res = response;
       if (res.status) {
-        this.documentsData = res.data;   // already ordered by server (-uploaded_at)
-        this.totalDocuments = res.total ?? res.data.length;
+        this.allDocuments = res.data || [];
+        this.totalDocuments = res.total ?? this.allDocuments.length;
         this.currentPage = res.page ?? 1;
-        this.show = this.documentsData.length > 0;
-        this.noData = this.documentsData.length === 0;
-        this.count = this.documentsData.length;
+        this.filterDocuments();
       }
     });
+  }
+
+  filterDocuments() {
+    if (!this.searchTerm.trim()) {
+      this.documentsData = this.allDocuments;
+    } else {
+      const q = this.searchTerm.toLowerCase().trim();
+      this.documentsData = this.allDocuments.filter((doc: any) =>
+        (doc.title || '').toLowerCase().includes(q)
+      );
+    }
+    this.show = this.documentsData.length > 0;
+    this.noData = this.documentsData.length === 0;
+    this.count = this.documentsData.length;
   }
 
   getURL(source: any) {
@@ -88,8 +102,10 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   isImage(fileUrl: string): boolean {
-    const ext = fileUrl.split('.').pop()?.toLowerCase();
-    return ['jpg', 'jpeg', 'png', 'gif'].includes(ext || '');
+    if (!fileUrl) return false;
+    const cleanUrl = fileUrl.split('?')[0].split('#')[0];
+    const ext = cleanUrl.split('.').pop()?.toLowerCase();
+    return ['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(ext || '');
   }
 
   delete(data: any) {

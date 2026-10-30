@@ -141,8 +141,7 @@ def createUser(request):
             response_details.update({
                 "status": True,
                 'status_code': 200,
-                'message': f'OTP sent to email. (Backup OTP: {otp})',
-                'otp': otp
+                'message': 'OTP sent to email for verification',
             })
         return Response(response_details)
     except Exception as e:
@@ -273,8 +272,7 @@ def requestOtpWithPassword(request):
         response_details.update({
             "status": True,
             "status_code": 200,
-            "message": f"OTP sent to your email. (Backup OTP: {otp})",
-            "otp": otp
+            "message": "OTP sent to your email",
         })
         return Response(response_details, status=200)
 
@@ -369,8 +367,7 @@ def verify_face_and_send_otp(request):
         return Response({
             "status": True,
             "status_code": 200,
-            "message": f"Face registered! OTP sent to email. (Backup OTP: {otp})",
-            "otp": otp
+            "message": "Face registered successfully! OTP sent directly to email.",
         })
 
     # ── Returning user — validate input descriptor first ────────────────────
@@ -410,8 +407,7 @@ def verify_face_and_send_otp(request):
             return Response({
                 "status": True,
                 "status_code": 200,
-                "message": f"Face matched! OTP sent to email. (Backup OTP: {otp})",
-                "otp": otp
+                "message": "Face matched successfully! OTP sent to your email.",
             })
         else:
             _send_mismatch_alert(user, email, request)
@@ -564,6 +560,8 @@ def loginverifyOtp(request):
                 "status_code": 200,
                 "message": "OTP verified",
                 "token": token.key,
+                "user_id": user.user_id,
+                "name": user.name or "",
             })
         else:
             response_details['message'] = 'Invalid OTP'
@@ -602,8 +600,7 @@ def forgot_password(request):
     return Response({
         'status': True,
         'status_code': 200,
-        'message': f'OTP sent to your email. (Backup OTP: {otp})',
-        'otp': otp
+        'message': 'OTP sent to your email',
     })
 
 
@@ -725,8 +722,13 @@ def getUserDocuments(request):
 def deleteDocument(request, d_id):
     try:
         doc = Students_documents.objects.get(pk=d_id, user=request.user)
-        public_id = doc.document.public_id
-        destroy(public_id)
+        try:
+            public_id = doc.document.public_id
+            if public_id:
+                destroy(public_id, resource_type='raw')
+                destroy(public_id, resource_type='image')
+        except Exception as cloud_err:
+            print(f"[Cloudinary Delete Warning]: {cloud_err}")
         doc.delete()
         return Response({
             "status": True,

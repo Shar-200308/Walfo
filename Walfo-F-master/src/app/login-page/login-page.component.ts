@@ -39,7 +39,6 @@ export class LoginPageComponent implements OnInit, OnDestroy {
   failedAttempts = 0;
   readonly maxAttempts = 3;
   readonly FACE_MATCH_THRESHOLD = 0.60;
-  backupOtp: string | null = null;
 
   // ── Liveness state ────────────────────────────────────────────────────
   livenessVerified = false;           // final gate: all checks passed
@@ -629,7 +628,6 @@ export class LoginPageComponent implements OnInit, OnDestroy {
       const res = response;
       if (res.status) {
         this.failedAttempts = 0;
-        this.backupOtp = res.otp || null;
         this.stopCamera();
         this.FaceScan = false;
         this.Otp = true;
@@ -687,16 +685,27 @@ export class LoginPageComponent implements OnInit, OnDestroy {
         email: this.loginForm.value.email,
         otp
       };
-      this.web.loginVerify(data).subscribe((response: any) => {
-        const res = response;
-        if (res.status) {
+      this.web.loginVerify(data).subscribe({
+        next: (response: any) => {
+          const res = response;
           this.verifyingOtp = false;
-          localStorage.setItem('studentToken', res.token);
-          this.router.navigate(['/dashboard']);
-        } else {
+          if (res.status) {
+            localStorage.setItem('studentToken', res.token);
+            if (res.name) localStorage.setItem('nickname', res.name);
+            if (res.user_id) localStorage.setItem('user_id', res.user_id);
+            this.router.navigate(['/dashboard']);
+          } else {
+            this.toaster.title = 'Error';
+            this.toaster.message = res.message;
+            this.toaster.sIcon = false;
+            this.toaster.isRed = true;
+            this.toaster.showToaster();
+          }
+        },
+        error: (err: any) => {
           this.verifyingOtp = false;
           this.toaster.title = 'Error';
-          this.toaster.message = res.message;
+          this.toaster.message = err?.error?.message || 'Verification failed. Please check OTP and try again.';
           this.toaster.sIcon = false;
           this.toaster.isRed = true;
           this.toaster.showToaster();

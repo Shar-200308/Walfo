@@ -34,6 +34,7 @@ export class UploadDocumentComponent {
         let res = JSON.parse(JSON.stringify(response));
         if(res.status){
           this.uploadForm.reset();
+          this.file = null;
           this.toaster.title = 'Success';
           this.toaster.isRed = false;
           this.toaster.sIcon = true;

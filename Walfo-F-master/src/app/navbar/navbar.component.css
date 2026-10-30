@@ -37,7 +37,9 @@
 .navbar {
   background-color: #2b2b2b;
   width: 260px;
-  height: 100vh;
+  height: 100%;
+  height: 100dvh;
+  max-height: 100dvh;
   position: fixed;
   top: 0;
   left: 0;
@@ -48,6 +50,8 @@
   transform: translateX(-100%);
   z-index: 100;
   box-shadow: 4px 0 20px rgba(0, 0, 0, 0.3);
+  box-sizing: border-box;
+  padding-bottom: max(16px, env(safe-area-inset-bottom, 16px));
 }
 
 .navbar.show {
@@ -82,16 +86,19 @@
 .menu {
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
   flex: 1;
-  padding: 20px 14px;
+  padding: 16px 14px;
   overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  gap: 4px;
 }
 
 .menu-container ul {
   display: flex;
   flex-direction: column;
   gap: 8px;
+  margin: 0;
+  padding: 0;
 }
 
 .nav-link {
@@ -106,6 +113,8 @@
   font-size: 15px;
   font-weight: 500;
   transition: all 0.2s ease;
+  user-select: none;
+  touch-action: manipulation;
 }
 
 .nav-link:hover {
@@ -125,6 +134,48 @@
   stroke: #9cee69 !important;
 }
 
+/* ── Menu Divider ── */
+.menu-divider {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.12);
+  margin: 10px 4px;
+}
+
+/* ── Logout Section ── */
+.logout {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+}
+
+.logout-item {
+  color: #ff7675;
+  transition: all 0.2s ease;
+}
+
+.logout-item svg path {
+  fill: #ff7675;
+  transition: fill 0.2s ease;
+}
+
+.logout-item:hover,
+.logout-item:active {
+  background-color: rgba(231, 76, 60, 0.16);
+  color: #ff5252;
+}
+
+.logout-item:hover svg path,
+.logout-item:active svg path {
+  fill: #ff5252;
+}
+
+.logout-item a {
+  color: inherit !important;
+  font-weight: 600;
+  cursor: pointer;
+}
+
 /* ── Desktop & Tablet View (>= 640px) ── */
 @media screen and (min-width: 640px) {
   .mobile-toggle-btn,
@@ -138,14 +189,24 @@
     transform: translateX(0) !important;
     box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
     background-color: #2b2b2b;
+    padding-bottom: 20px;
   }
 
   .menu {
     padding: 30px 14px 20px 14px;
+    gap: 0;
   }
 
   .menu-container ul {
     gap: 10px;
+  }
+
+  .menu-divider {
+    display: none;
+  }
+
+  .logout {
+    margin-top: auto;
   }
 }
 
@@ -156,15 +217,6 @@ ul li {
   align-items: center;
 }
 ul li a {
-  text-decoration: none;
-  color: white;
-  font-family: "Karla", sans-serif;
-  cursor: pointer;
-}
-.logout {
-  display: flex;
-}
-.logout a {
   text-decoration: none;
   color: white;
   font-family: "Karla", sans-serif;

@@ -69,22 +69,22 @@ export class DialogComponent {
     const fileName = this.dialogData.document.split('/').pop() || 'download';
 
     // Step 4: Make HTTP GET request to get file as blob
-    this.http.get(fileUrl, { responseType: 'blob' }).subscribe(blob => {
-      const blobUrl = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = blobUrl;
-      a.download = fileName;
-      a.style.display = 'none';
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      window.URL.revokeObjectURL(blobUrl);
-    }, error => {
-      this.toaster.title = 'Error';
-      this.toaster.message = 'Failed to download file.';
-      this.toaster.sIcon = false;
-      this.toaster.isRed = true;
-      this.toaster.showToaster();
+    this.http.get(fileUrl, { responseType: 'blob' }).subscribe({
+      next: (blob) => {
+        const blobUrl = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = blobUrl;
+        a.download = fileName;
+        a.style.display = 'none';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(blobUrl);
+      },
+      error: () => {
+        // Fallback: open original file directly so the user is never blocked
+        window.open(this.getURL(), '_blank');
+      }
     });
   }
 
